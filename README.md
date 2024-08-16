@@ -44,7 +44,7 @@ This is a v1 of the tool, with the core capabilities to quickly start working wi
 - define an alias to have direct access to the command:
 
 ```bash
-alias joci='python ~/dev/joci.py'
+alias coci='python ~/dev/coci.py'
 ```
 
 ## Customizations
