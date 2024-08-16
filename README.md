@@ -1,14 +1,14 @@
-# OciConsole
+# coci - interactive Command-Line OCI Console
 
 A Command-line console for interacting with an OCI instance
 
 ## Prerequisites
 
-- oci CLI installed
+- oci CLI installed (see [OCI CLI Quickstart](https://docs.oracle.com/en-us/iaas/Content/API/SDKDocs/cliinstall.htm#Quickstart)] )
 - API key set up on OCI and .oci/config file created
 - Tested with Python 3.11.7
-- Install python packages oci and readchar
-- Download the joci.py file from this repo
+- Install python packages `oci` and `readchar`
+- Download the coci.py file from this repo
 
 ## Objective of this tool
 
