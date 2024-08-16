@@ -1,6 +1,6 @@
-# joci: a command-line interface for managing your OCI environment: listing available entities, 
-# starting and stopping entities, all without the need to use OCID's or repeated authentication
-# This script will NOT create new or delete any entities, as in that case a lot of info needs to be provided, use the GUI for that.
+# coci: a command-line interface for managing your OCI environment: listing available resources, 
+# starting and stopping resources, all without the need to use OCID's or repeated authentication
+# This script will NOT create new or delete any resources, as in that case a lot of info needs to be provided, use the GUI for that.
 
 import oci
 import readchar
@@ -240,6 +240,11 @@ while (True):
         if DEBUG: print(list_container_repositories_response.data.items)
         for i in list_container_repositories_response.data.items:
             print("Name: ", i.display_name)
+
+
+    # Author: Jan Leemans
+    # Version : 1.0
+    # Last Updated: 16-Aug-2024
 
 # Rerun script to list instances and follow-up states
     elif (action == 'q'):
