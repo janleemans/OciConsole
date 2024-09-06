@@ -4,29 +4,41 @@
 
 import oci
 import readchar
+import re
+import os
+
+# You can set DEBUG to True to see printouts at various places
+DEBUG = False
 
 # Make sure to configure the .oci/config file as proposed during the creation of an API key for your oci user.
 # Also pick the right profile in case you have multiple profiles in your config file, using the name of the profile as below
 config = oci.config.from_file("~/.oci/config", "DEFAULT")
 
-# Validate Authentication
-#------------------------
-idd = oci.identity.IdentityClient(config)
-identity = oci.identity.IdentityClient(config)
-user = identity.get_user(config["user"]).data
-tenancy = identity.get_tenancy(config["tenancy"]).data
-DEBUG = True
+def set_tenancy_config():
+    global idd
+    global user
+    global identity
+    global tenancy
+    global compart
+    global compartment_name
 
-# You can add an entry "compartment" to your OCI config file to set your default string compartment for the script.  
-try:
-    compart = config["compartment"]
-except:
-    # if not provided, use the root compartment of the user
-    compart = user.compartment_id
+    idd = oci.identity.IdentityClient(config)
+    identity = oci.identity.IdentityClient(config)
+    user = identity.get_user(config["user"]).data
+    tenancy = identity.get_tenancy(config["tenancy"]).data
 
-# Extract the compartment name
-compartment_response = identity.get_compartment(compartment_id=compart).data
-compartment_name = compartment_response.name
+    # You can add an entry "compartment" to your OCI config file to set your default string compartment for the script.
+    try:
+        compart = config["compartment"]
+    except:
+        # if not provided, use the root compartment of the user
+        compart = user.compartment_id
+
+    # Extract the compartment name
+    compartment_response = identity.get_compartment(compartment_id=compart).data
+    compartment_name = compartment_response.name
+
+set_tenancy_config()
 
 # Main top level loop showing available commands
 while (True):
@@ -42,6 +54,7 @@ while (True):
     print("s: Storage")
     print("d: Databases - only autonomous for now")
     print("i: CN objects: containers")
+    print("t: choose a new Tenancy config from your config file to connect to")
     print("q: quit")
     action = readchar.readchar()
 
@@ -241,12 +254,38 @@ while (True):
         for i in list_container_repositories_response.data.items:
             print("Name: ", i.display_name)
 
+     # List available tenancy configs in the config file
+    elif(action =='t'):
+        try:
+            # Read the file content
+            file_path = os.path.join(os.path.expanduser('~'), '.oci', 'config')
+            with open(file_path, 'r') as file:
+                content = file.read()
+            # Find all values between square brackets
+            config_values = re.findall(r'\[(.*?)\]', content)
+            # Print the values
+            print ('Available Tenancy configs available in your config file')
+            for cnt, configs in enumerate(config_values):
+                print(f"Config {cnt}: {configs}")
+        except Exception as e:
+            print(f"An error occurred: {e}")
 
-    # Author: Jan Leemans
-    # Version : 1.0
-    # Last Updated: 16-Aug-2024
+        try:
+            index = int(input("Enter config ID to load: "))
+            if index >= 0 and index < len(config_values):
+                print ("Loading config: ",config_values[index])
+                config = oci.config.from_file("~/.oci/config", config_values[index])
+                set_tenancy_config()
+            else:
+                print("Not a compartment number")
+        except Exception as e:
+            print(f"An error occurred: {e}")
 
 # Rerun script to list instances and follow-up states
     elif (action == 'q'):
         print("Quitting")
         quit()
+
+    # Author: Jan Leemans
+    # Version : 1.0
+    # Last Updated: 16-Aug-2024
